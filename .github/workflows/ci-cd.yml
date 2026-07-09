@@ -61,8 +61,14 @@ jobs:
     if: ${{ github.ref == 'refs/heads/main' }}
 
     steps:
+      - name: Check deployment secrets
+        run: |
+          if [ -z "${{ secrets.DEPLOY_HOST }}" ] || [ -z "${{ secrets.DEPLOY_USERNAME }}" ] || [ -z "${{ secrets.DEPLOY_SSH_KEY }}" ]; then
+            echo "Deployment secrets are not fully configured. Skipping deployment."
+            exit 0
+          fi
+
       - name: Deploy to remote server
-        if: ${{ secrets.DEPLOY_HOST != '' && secrets.DEPLOY_USERNAME != '' && secrets.DEPLOY_SSH_KEY != '' }}
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.DEPLOY_HOST }}
